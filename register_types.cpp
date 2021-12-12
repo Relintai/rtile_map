@@ -22,13 +22,22 @@ SOFTWARE.
 
 #include "register_types.h"
 
+#include "tile_map.h"
+#include "tile_set.h"
+
 #ifdef TOOLS_ENABLED
+#include "tile_map_editor_plugin.h"
+#include "tile_set_editor_plugin.h"
 #endif
 
 void register_rtile_map_types() {
 #ifdef TOOLS_ENABLED
+	EditorPlugins::add_by_type<RTileMapEditorPlugin>();
+	EditorPlugins::add_by_type<RTileSetEditorPlugin>();
 #endif
 
+	ClassDB::register_class<RTileMap>();
+	ClassDB::register_class<RTileSet>();
 }
 
 void unregister_rtile_map_types() {
