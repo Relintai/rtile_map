@@ -1,0 +1,7 @@
+Import('env')
+
+env.add_source_files(env.modules_sources,"register_types.cpp")
+
+#if env["tools"]:
+#    env.add_source_files(env.modules_sources, "tile_editor/*.cpp")
+    
