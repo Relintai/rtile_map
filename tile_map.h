@@ -37,6 +37,8 @@
 #include "scene/2d/node_2d.h"
 #include "tile_set.h"
 
+#include "../fastnoise/noise.h"
+
 class CollisionObject2D;
 
 class RTileMap : public Node2D {
@@ -80,6 +82,7 @@ private:
 	bool use_kinematic;
 	Navigation2D *navigation;
 	bool show_collision = false;
+	Ref<FastNoise> noise;
 
 	union PosKey {
 		struct {
@@ -110,18 +113,24 @@ private:
 		}
 	};
 
-	union Cell {
-		struct {
-			int32_t id : 24;
-			bool flip_h : 1;
-			bool flip_v : 1;
-			bool transpose : 1;
-			int16_t autotile_coord_x : 16;
-			int16_t autotile_coord_y : 16;
-		};
+	struct Cell {
+		int32_t id;
+		bool flip_h;
+		bool flip_v;
+		bool transpose;
+		int16_t autotile_coord_x;
+		int16_t autotile_coord_y;
+		uint8_t rao;
 
-		uint64_t _u64t;
-		Cell() { _u64t = 0; }
+		Cell() {
+			id = 0;
+			flip_h = false;
+			flip_v = false;
+			transpose = false;
+			autotile_coord_x = 0;
+			autotile_coord_y = 0;
+			rao = 0;
+		}
 	};
 
 	Map<PosKey, Cell> tile_map;

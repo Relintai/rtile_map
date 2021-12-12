@@ -549,8 +549,10 @@ void RTileMap::update_dirty_quadrants() {
 			Ref<Texture> normal_map = tile_set->tile_get_normal_map(c.id);
 			Color modulate = tile_set->tile_get_modulate(c.id);
 			Color self_modulate = get_self_modulate();
-			modulate = Color(modulate.r * self_modulate.r, modulate.g * self_modulate.g,
-					modulate.b * self_modulate.b, modulate.a * self_modulate.a);
+			float col = (static_cast<float>(c.rao) / 255.0) * 0.3;
+
+			modulate = Color(modulate.r * self_modulate.r - col, modulate.g * self_modulate.g - col,
+					modulate.b * self_modulate.b - col, modulate.a * self_modulate.a);
 			if (r == Rect2()) {
 				tex->draw_rect(canvas_item, rect, false, modulate, c.transpose, normal_map);
 			} else {
@@ -897,7 +899,7 @@ void RTileMap::set_cell(int p_x, int p_y, int p_tile, bool p_flip_x, bool p_flip
 	} else {
 		ERR_FAIL_COND(!Q); // quadrant should exist...
 
-		if (E->get().id == p_tile && E->get().flip_h == p_flip_x && E->get().flip_v == p_flip_y && E->get().transpose == p_transpose && E->get().autotile_coord_x == (uint16_t)p_autotile_coord.x && E->get().autotile_coord_y == (uint16_t)p_autotile_coord.y) {
+		if (E->get().id == p_tile && E->get().flip_h == p_flip_x && E->get().flip_v == p_flip_y && E->get().transpose == p_transpose && E->get().autotile_coord_x == (int16_t)p_autotile_coord.x && E->get().autotile_coord_y == (int16_t)p_autotile_coord.y) {
 			return; //nothing changed
 		}
 	}
@@ -908,8 +910,9 @@ void RTileMap::set_cell(int p_x, int p_y, int p_tile, bool p_flip_x, bool p_flip
 	c.flip_h = p_flip_x;
 	c.flip_v = p_flip_y;
 	c.transpose = p_transpose;
-	c.autotile_coord_x = (uint16_t)p_autotile_coord.x;
-	c.autotile_coord_y = (uint16_t)p_autotile_coord.y;
+	c.autotile_coord_x = (int16_t)p_autotile_coord.x;
+	c.autotile_coord_y = (int16_t)p_autotile_coord.y;
+	c.rao = static_cast<uint8_t>(static_cast<int>(CLAMP(noise->get_noise_2d(p_x, p_y), 0, 1) * 256.0) % 256);
 
 	_make_quadrant_dirty(Q);
 	used_size_cache_dirty = true;
@@ -1267,6 +1270,7 @@ PoolVector<int> RTileMap::_get_tile_data() const {
 		encode_uint32(val, &ptr[4]);
 		encode_uint16(E->get().autotile_coord_x, &ptr[8]);
 		encode_uint16(E->get().autotile_coord_y, &ptr[10]);
+
 		idx += 3;
 	}
 
@@ -1895,6 +1899,10 @@ void RTileMap::_changed_callback(Object *p_changed, const char *p_prop) {
 }
 
 RTileMap::RTileMap() {
+	noise.instance();
+	//noise->set_seed(Math::rand());
+	noise->set_noise_type(FastNoise::TYPE_PERLIN);
+
 	rect_cache_dirty = true;
 	used_size_cache_dirty = true;
 	pending_update = false;
