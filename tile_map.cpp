@@ -30,11 +30,11 @@
 
 #include "tile_map.h"
 
-#include "scene/2d/collision_object_2d.h"
 #include "core/io/marshalls.h"
 #include "core/method_bind_ext.gen.inc"
 #include "core/os/os.h"
 #include "scene/2d/area_2d.h"
+#include "scene/2d/collision_object_2d.h"
 #include "servers/physics_2d_server.h"
 
 int RTileMap::_get_quadrant_size() const {
@@ -222,6 +222,19 @@ void RTileMap::set_quadrant_size(int p_size) {
 
 int RTileMap::get_quadrant_size() const {
 	return quadrant_size;
+}
+
+void RTileMap::set_use_rao(bool p_rao) {
+	bool recreate = _use_rao != p_rao;
+
+	_use_rao = p_rao;
+
+	if (recreate) {
+		_recreate_quadrants();
+	}
+}
+bool RTileMap::get_use_rao() const {
+	return _use_rao;
 }
 
 void RTileMap::_fix_cell_transform(Transform2D &xform, const Cell &p_cell, const Vector2 &p_offset, const Size2 &p_sc) {
@@ -550,7 +563,12 @@ void RTileMap::update_dirty_quadrants() {
 			Ref<Texture> normal_map = tile_set->tile_get_normal_map(c.id);
 			Color modulate = tile_set->tile_get_modulate(c.id);
 			Color self_modulate = get_self_modulate();
-			float col = (static_cast<float>(c.rao) / 255.0) * 0.3;
+			
+			float col = 0;
+
+			if (_use_rao) {
+				col = (static_cast<float>(c.rao) / 255.0) * 0.3;
+			}
 
 			modulate = Color(modulate.r * self_modulate.r - col, modulate.g * self_modulate.g - col,
 					modulate.b * self_modulate.b - col, modulate.a * self_modulate.a);
@@ -1846,6 +1864,10 @@ void RTileMap::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_set_tile_data"), &RTileMap::_set_tile_data);
 	ClassDB::bind_method(D_METHOD("_get_tile_data"), &RTileMap::_get_tile_data);
 
+	ClassDB::bind_method(D_METHOD("set_use_rao", "value"), &RTileMap::set_use_rao);
+	ClassDB::bind_method(D_METHOD("get_use_rao"), &RTileMap::get_use_rao);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "use_rao"), "set_use_rao", "get_use_rao");
+
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "mode", PROPERTY_HINT_ENUM, "Square,Isometric,Custom"), "set_mode", "get_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "tile_set", PROPERTY_HINT_RESOURCE_TYPE, "RTileSet"), "set_tileset", "get_tileset");
 
@@ -1900,6 +1922,8 @@ void RTileMap::_changed_callback(Object *p_changed, const char *p_prop) {
 }
 
 RTileMap::RTileMap() {
+	_use_rao = true;
+
 	noise.instance();
 
 	rect_cache_dirty = true;

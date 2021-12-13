@@ -83,6 +83,7 @@ private:
 	Navigation2D *navigation;
 	bool show_collision = false;
 	Ref<FastNoise> noise;
+	bool _use_rao;
 
 	union PosKey {
 		struct {
@@ -262,6 +263,9 @@ public:
 
 	void set_quadrant_size(int p_size);
 	int get_quadrant_size() const;
+
+	void set_use_rao(bool p_rao);
+	bool get_use_rao() const;
 
 	void set_cell(int p_x, int p_y, int p_tile, bool p_flip_x = false, bool p_flip_y = false, bool p_transpose = false, Vector2 p_autotile_coord = Vector2());
 	int get_cell(int p_x, int p_y) const;
