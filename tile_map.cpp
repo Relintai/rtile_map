@@ -563,7 +563,7 @@ void RTileMap::update_dirty_quadrants() {
 			Ref<Texture> normal_map = tile_set->tile_get_normal_map(c.id);
 			Color modulate = tile_set->tile_get_modulate(c.id);
 			Color self_modulate = get_self_modulate();
-			
+
 			float col = 0;
 
 			if (_use_rao) {
@@ -931,7 +931,7 @@ void RTileMap::set_cell(int p_x, int p_y, int p_tile, bool p_flip_x, bool p_flip
 	c.transpose = p_transpose;
 	c.autotile_coord_x = (int16_t)p_autotile_coord.x;
 	c.autotile_coord_y = (int16_t)p_autotile_coord.y;
-	c.rao = static_cast<uint8_t>(static_cast<int>(CLAMP(noise->get_noise_2d(p_x, p_y), 0, 1) * 256.0) % 256);
+	c.rao = static_cast<uint8_t>(static_cast<int>(CLAMP(noise->get_noise_2d(p_x, p_y), 0, 1) * 255.0) % 255);
 
 	_make_quadrant_dirty(Q);
 	used_size_cache_dirty = true;
@@ -1260,7 +1260,7 @@ void RTileMap::_set_tile_data(const PoolVector<int> &p_data) {
 			coord_y = decode_uint16(&local[10]);
 		}
 
-		set_cell(x, y, v, flip_h, flip_v, transpose, Vector2(coord_x, coord_y));
+		set_cell(static_cast<int16_t>(x), static_cast<int16_t>(y), v, flip_h, flip_v, transpose, Vector2(coord_x, coord_y));
 	}
 }
 
