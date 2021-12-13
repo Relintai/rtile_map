@@ -185,6 +185,7 @@ void RTileMap::set_tileset(const Ref<RTileSet> &p_tileset) {
 	if (tile_set.is_valid()) {
 		tile_set->connect("changed", this, "_recreate_quadrants");
 		tile_set->add_change_receptor(this);
+		tile_set->setup_noise(noise);
 	} else {
 		clear();
 	}
@@ -1900,8 +1901,6 @@ void RTileMap::_changed_callback(Object *p_changed, const char *p_prop) {
 
 RTileMap::RTileMap() {
 	noise.instance();
-	//noise->set_seed(Math::rand());
-	noise->set_noise_type(FastNoise::TYPE_PERLIN);
 
 	rect_cache_dirty = true;
 	used_size_cache_dirty = true;

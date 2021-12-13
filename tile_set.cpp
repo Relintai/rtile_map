@@ -1087,6 +1087,18 @@ int RTileSet::get_last_unused_tile_id() const {
 	}
 }
 
+void RTileSet::set_noise_params(const Ref<FastnoiseNoiseParams> &noise) {
+	_noise_params = noise;
+}
+Ref<FastnoiseNoiseParams> RTileSet::get_noise_params() {
+	return _noise_params;
+}
+void RTileSet::setup_noise(Ref<FastNoise> noise) {
+	if (_noise_params.is_valid()) {
+		_noise_params->setup_noise(noise);
+	}
+}
+
 int RTileSet::find_tile_by_name(const String &p_name) const {
 	for (Map<int, TileData>::Element *E = tile_map.front(); E; E = E->next()) {
 		if (p_name == E->get().name) {
@@ -1169,6 +1181,12 @@ void RTileSet::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_last_unused_tile_id"), &RTileSet::get_last_unused_tile_id);
 	ClassDB::bind_method(D_METHOD("find_tile_by_name", "name"), &RTileSet::find_tile_by_name);
 	ClassDB::bind_method(D_METHOD("get_tiles_ids"), &RTileSet::_get_tiles_ids);
+
+	ClassDB::bind_method(D_METHOD("set_noise_params", "noise"), &RTileSet::set_noise_params);
+	ClassDB::bind_method(D_METHOD("get_noise_params"), &RTileSet::get_noise_params);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "noise", PROPERTY_HINT_RESOURCE_TYPE, "FastnoiseNoiseParams"), "set_noise_params", "get_noise_params");
+
+	ClassDB::bind_method(D_METHOD("setup_noise", "noise"), &RTileSet::setup_noise);
 
 	BIND_VMETHOD(MethodInfo(Variant::BOOL, "_is_tile_bound", PropertyInfo(Variant::INT, "drawn_id"), PropertyInfo(Variant::INT, "neighbor_id")));
 	BIND_VMETHOD(MethodInfo(Variant::VECTOR2, "_forward_subtile_selection", PropertyInfo(Variant::INT, "autotile_id"), PropertyInfo(Variant::INT, "bitmask"), PropertyInfo(Variant::OBJECT, "tilemap", PROPERTY_HINT_NONE, "RTileMap"), PropertyInfo(Variant::VECTOR2, "tile_location")));

@@ -38,6 +38,8 @@
 #include "scene/resources/convex_polygon_shape_2d.h"
 #include "scene/resources/shape_2d.h"
 #include "scene/resources/texture.h"
+#include "../fastnoise/noise.h"
+#include "../fastnoise/fastnoise_noise_params.h"
 
 class RTileSet : public Resource {
 	GDCLASS(RTileSet, Resource);
@@ -135,6 +137,8 @@ private:
 	};
 
 	Map<int, TileData> tile_map;
+
+	Ref<FastnoiseNoiseParams> _noise_params;
 
 protected:
 	bool _set(const StringName &p_name, const Variant &p_value);
@@ -258,6 +262,10 @@ public:
 	void clear();
 
 	int get_last_unused_tile_id() const;
+
+	void set_noise_params(const Ref<FastnoiseNoiseParams> &noise);
+	Ref<FastnoiseNoiseParams> get_noise_params();
+	void setup_noise(Ref<FastNoise> noise);
 
 	RTileSet();
 };
