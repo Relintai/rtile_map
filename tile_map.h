@@ -36,6 +36,7 @@
 #include "scene/2d/navigation_2d.h"
 #include "scene/2d/node_2d.h"
 #include "tile_set.h"
+#include "core/version.h"
 
 #include "../fastnoise/noise.h"
 
@@ -146,7 +147,11 @@ private:
 		SelfList<Quadrant> dirty_list;
 
 		struct NavPoly {
+#if VERSION_MINOR < 5
 			int id;
+#else
+			RID region;
+#endif
 			Transform2D xform;
 		};
 

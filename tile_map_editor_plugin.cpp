@@ -30,12 +30,13 @@
 
 #include "tile_map_editor_plugin.h"
 
-#include "editor/plugins/canvas_item_editor_plugin.h"
 #include "core/math/math_funcs.h"
 #include "core/os/input.h"
 #include "core/os/keyboard.h"
+#include "core/version.h"
 #include "editor/editor_scale.h"
 #include "editor/editor_settings.h"
+#include "editor/plugins/canvas_item_editor_plugin.h"
 #include "scene/gui/split_container.h"
 
 void RTileMapEditor::_node_removed(Node *p_node) {
@@ -2132,10 +2133,18 @@ void RTileMapEditorPlugin::_notification(int p_what) {
 	if (p_what == EditorSettings::NOTIFICATION_EDITOR_SETTINGS_CHANGED) {
 		switch ((int)EditorSettings::get_singleton()->get("editors/tile_map/editor_side")) {
 			case 0: { // Left.
+#if VERSION_MINOR < 5
 				CanvasItemEditor::get_singleton()->get_palette_split()->move_child(tile_map_editor, 0);
+#else
+				CanvasItemEditor::get_singleton()->move_control_to_left_panel(tile_map_editor);
+#endif
 			} break;
 			case 1: { // Right.
+#if VERSION_MINOR < 5
 				CanvasItemEditor::get_singleton()->get_palette_split()->move_child(tile_map_editor, 1);
+#else
+				CanvasItemEditor::get_singleton()->move_control_to_right_panel(tile_map_editor);
+#endif
 			} break;
 		}
 	}
